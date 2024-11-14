@@ -2,73 +2,115 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Xml.Schema;
-using static System.Net.Mime.MediaTypeNames;
 
 namespace AdventOfCode
 {
     internal class Program
     {
+        public class House
+        {
+            private static int x = 0;
+            private static int y = 0;
+
+            public House(int xPosition, int yPosition)
+            {
+                x = xPosition; y = yPosition;
+
+            }
+
+        }
+
         static void Main(string[] args)
         {
+
             Console.WriteLine("Reading File: ");
             //string[] a = (string[])File.ReadAllLines("C:\\Users\\avetaash\\source\\repos\\AdventOfCode\\text.txt");
             string[] a = (string[])File.ReadAllLines(Directory.GetCurrentDirectory() + "\\..\\..\\..\\text.txt");
             Console.WriteLine("Total lines: " + a.Length);
+            Console.WriteLine("Total movements: " + a[0].Length);
 
-            int totalPaper = 0, totalRibbon = 0;
+            List<House> houses = new List<House>();
 
-            foreach (string line in a)
+            HashSet<string> uniquehouses = new HashSet<string>();
+
+            houses.Add(new House(0, 0));
+            uniquehouses.Add($"0,0");
+
+            int x = 0, y = 0;
+
+            foreach (char i in a[0])
             {
-                totalPaper = totalPaper + CalculatePaper(line);
+                if (i == '^') y++;
+                if (i == 'v') y--;
+                if (i == '>') x++;
+                if (i == '<') x--;
+
+                houses.Add(new House(x, y));
+                uniquehouses.Add($"{x},{y}");
             }
 
-            foreach (string line in a)
+            Console.WriteLine("Santa delivery");
+
+            Console.WriteLine("Total presents delivered" + houses.Count);
+            Console.WriteLine("Total distict houses: " + uniquehouses.Count);
+
+            //Part 2
+
+            List<House> SantaHouses = new List<House>();
+            List<House> RoboHouses = new List<House>();
+
+            HashSet<string> uniquehousesdual = new HashSet<string>();
+
+            SantaHouses.Add(new House(0, 0));
+            RoboHouses.Add(new House(0, 0));
+            uniquehousesdual.Add($"0,0");
+
+            int xSanta = 0, ySanta = 0, xRobo = 0, yRobo = 0, count = 0;
+
+            foreach (char i in a[0])
             {
-                totalRibbon = totalRibbon + CalculateRibbon(line);
+
+                if (count % 2 == 0)
+                {
+                    if (i == '^') ySanta++;
+                    if (i == 'v') ySanta--;
+                    if (i == '>') xSanta++;
+                    if (i == '<') xSanta--;
+                }
+                else
+                {
+                    if (i == '^') yRobo++;
+                    if (i == 'v') yRobo--;
+                    if (i == '>') xRobo++;
+                    if (i == '<') xRobo--;
+                }
+
+
+
+                uniquehousesdual.Add($"{xSanta},{ySanta}");
+                uniquehousesdual.Add($"{xRobo},{yRobo}");
+
+
+                count++;
             }
 
-            Console.WriteLine("Total paper: " + totalPaper);
-            Console.WriteLine("Total Ribbon: " + totalRibbon);
+            Console.WriteLine();
+            Console.WriteLine("Santa and RoboSanta delivery");
+            Console.WriteLine("Total distict houses: " + uniquehousesdual.Count);
+
+
+
+
 
 
             Console.ReadKey();
         }
 
 
-        static int CalculatePaper(string a)
-        {
-            int l = 0, w = 0, h = 0;
-
-            l = Int32.Parse(a.Split('x')[0]);
-            w = Int32.Parse(a.Split('x')[1]);
-            h = Int32.Parse(a.Split('x')[2]);
-            int[] b = { l * w, w * h, h * l };
-
-            return (2 * l * w) + (2 * w * h) + (2 * h * l) + b.Min();
-
-        }
-
-        static int CalculateRibbon(string a)
-        {
-            int l = 0, w = 0, h = 0;
-
-            l = Int32.Parse(a.Split('x')[0]);
-            w = Int32.Parse(a.Split('x')[1]);
-            h = Int32.Parse(a.Split('x')[2]);
-            int[] b = { l, w, h };
-            b = b.OrderBy(x => x).ToArray();
-            //Console.WriteLine("----------");
-            //Console.WriteLine("Dimension: " + a);
-            //Console.WriteLine("Parsed: " + l + "x" + w + "x" + h);
-            //Console.WriteLine("Ribbon: 2x" + b[0] + " + 2x " + b[1]);
-            //Console.WriteLine("Bow: " + l * w * h);
-            int total = (2 * b[0]) + (2 * b[1]) + (l * w * h);
-            //Console.WriteLine("Total: " + total);
-
-            return total;
-        }
     }
 }
