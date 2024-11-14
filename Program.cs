@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml.Schema;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace AdventOfCode
 {
@@ -12,43 +13,62 @@ namespace AdventOfCode
     {
         static void Main(string[] args)
         {
-            Console.WriteLine("Reading File...");
-            string[] a = (string[])File.ReadAllLines("D:\\Git\\vetaas-hoie\\AdventOfCode2015\\text.txt");
+            Console.WriteLine("Reading File: ");
+            //string[] a = (string[])File.ReadAllLines("C:\\Users\\avetaash\\source\\repos\\AdventOfCode\\text.txt");
+            string[] a = (string[])File.ReadAllLines(Directory.GetCurrentDirectory() + "\\..\\..\\..\\text.txt");
+            Console.WriteLine("Total lines: " + a.Length);
 
-            Console.WriteLine("Ended up in floor: " + Day1(a[0]));
-            Console.WriteLine("First time in basement: " + Day1_2(a[0]));
+            int totalPaper = 0, totalRibbon = 0;
+
+            foreach (string line in a)
+            {
+                totalPaper = totalPaper + CalculatePaper(line);
+            }
+
+            foreach (string line in a)
+            {
+                totalRibbon = totalRibbon + CalculateRibbon(line);
+            }
+
+            Console.WriteLine("Total paper: " + totalPaper);
+            Console.WriteLine("Total Ribbon: " + totalRibbon);
 
 
             Console.ReadKey();
         }
 
-        static int Day1(string a)
+
+        static int CalculatePaper(string a)
         {
-            int floor = 0;
+            int l = 0, w = 0, h = 0;
 
-            foreach (char c in a)
-            {
+            l = Int32.Parse(a.Split('x')[0]);
+            w = Int32.Parse(a.Split('x')[1]);
+            h = Int32.Parse(a.Split('x')[2]);
+            int[] b = { l * w, w * h, h * l };
 
-                if (c == '(') floor++;
-                if (c == ')') floor--;
+            return (2 * l * w) + (2 * w * h) + (2 * h * l) + b.Min();
 
-            }
-            return floor;
-        }
-        static int Day1_2(string a)
-        {
-            int floor = 0;
-            int count = 0;
-            foreach (char c in a)
-            {
-                count++;
-                if (c == '(') floor++;
-                if (c == ')') floor--;
-                if (floor == -1) return count;   //added for part two 
-            }
-            return floor;
         }
 
+        static int CalculateRibbon(string a)
+        {
+            int l = 0, w = 0, h = 0;
 
+            l = Int32.Parse(a.Split('x')[0]);
+            w = Int32.Parse(a.Split('x')[1]);
+            h = Int32.Parse(a.Split('x')[2]);
+            int[] b = { l, w, h };
+            b = b.OrderBy(x => x).ToArray();
+            //Console.WriteLine("----------");
+            //Console.WriteLine("Dimension: " + a);
+            //Console.WriteLine("Parsed: " + l + "x" + w + "x" + h);
+            //Console.WriteLine("Ribbon: 2x" + b[0] + " + 2x " + b[1]);
+            //Console.WriteLine("Bow: " + l * w * h);
+            int total = (2 * b[0]) + (2 * b[1]) + (l * w * h);
+            //Console.WriteLine("Total: " + total);
+
+            return total;
+        }
     }
 }
